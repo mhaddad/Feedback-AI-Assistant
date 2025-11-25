@@ -37,7 +37,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role?: string;
 }
 
 export type AppState = 'auth' | 'dashboard' | 'create' | 'review' | 'settings';
