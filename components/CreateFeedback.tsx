@@ -8,7 +8,7 @@ import { Button } from './Button';
 interface CreateFeedbackProps {
   user: User;
   onCancel: () => void;
-  onSave: (feedback: FeedbackEntry) => void;
+  onSave: (feedback: Omit<FeedbackEntry, 'id' | 'createdAt' | 'updatedAt'>) => void;
 }
 
 type Step = 'model' | 'input' | 'review';
@@ -16,12 +16,12 @@ type Step = 'model' | 'input' | 'review';
 export const CreateFeedback: React.FC<CreateFeedbackProps> = ({ user, onCancel, onSave }) => {
   const [step, setStep] = useState<Step>('model');
   const [selectedModelType, setSelectedModelType] = useState<FeedbackModelType | null>(null);
-  
+
   // Form State
   const [recipientName, setRecipientName] = useState('');
   const [relationship, setRelationship] = useState('Colleague');
   const [inputData, setInputData] = useState<Record<string, string>>({});
-  
+
   // Generation State
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedText, setGeneratedText] = useState('');
@@ -64,18 +64,16 @@ export const CreateFeedback: React.FC<CreateFeedbackProps> = ({ user, onCancel, 
 
   const handleSave = () => {
     if (!selectedModelType) return;
-    
-    const newFeedback: FeedbackEntry = {
-      id: crypto.randomUUID(),
+
+    const newFeedback: Omit<FeedbackEntry, 'id' | 'createdAt' | 'updatedAt'> = {
       recipientName,
       authorName: user.name,
       relationship,
       modelType: selectedModelType,
       inputData,
       generatedText,
-      createdAt: new Date().toISOString()
     };
-    
+
     onSave(newFeedback);
   };
 
@@ -93,7 +91,7 @@ export const CreateFeedback: React.FC<CreateFeedbackProps> = ({ user, onCancel, 
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {FEEDBACK_MODELS.map((model) => (
-            <div 
+            <div
               key={model.type}
               onClick={() => handleModelSelect(model.type)}
               className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg hover:border-primary/50 cursor-pointer transition-all group relative overflow-hidden"
@@ -118,7 +116,7 @@ export const CreateFeedback: React.FC<CreateFeedbackProps> = ({ user, onCancel, 
   if (step === 'input' && selectedModelDef) {
     return (
       <div className="max-w-3xl mx-auto fade-in pb-20">
-         <div className="mb-8 flex items-center gap-4">
+        <div className="mb-8 flex items-center gap-4">
           <Button variant="ghost" onClick={() => setStep('model')} className="h-10 w-10 p-0 rounded-full border border-gray-200">
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -133,8 +131,8 @@ export const CreateFeedback: React.FC<CreateFeedbackProps> = ({ user, onCancel, 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-900">Recipient Name</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                 placeholder="e.g. John Doe"
                 value={recipientName}
@@ -143,7 +141,7 @@ export const CreateFeedback: React.FC<CreateFeedbackProps> = ({ user, onCancel, 
             </div>
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-900">Relationship</label>
-              <select 
+              <select
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                 value={relationship}
                 onChange={(e) => setRelationship(e.target.value)}
@@ -185,9 +183,9 @@ export const CreateFeedback: React.FC<CreateFeedbackProps> = ({ user, onCancel, 
           )}
 
           <div className="pt-4">
-            <Button 
-              onClick={handleGenerate} 
-              isLoading={isGenerating} 
+            <Button
+              onClick={handleGenerate}
+              isLoading={isGenerating}
               disabled={!recipientName || Object.keys(inputData).length === 0}
               className="w-full py-4 text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
             >
@@ -206,7 +204,7 @@ export const CreateFeedback: React.FC<CreateFeedbackProps> = ({ user, onCancel, 
       <div className="max-w-4xl mx-auto fade-in">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-             <Button variant="ghost" onClick={() => setStep('input')} className="h-10 w-10 p-0 rounded-full border border-gray-200">
+            <Button variant="ghost" onClick={() => setStep('input')} className="h-10 w-10 p-0 rounded-full border border-gray-200">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <h1 className="text-2xl font-bold text-gray-900">Review Your Feedback</h1>
@@ -223,7 +221,7 @@ export const CreateFeedback: React.FC<CreateFeedbackProps> = ({ user, onCancel, 
             <p className="text-sm text-gray-500 mb-4">
               Review the generated text below. You can save it directly or edit it first.
             </p>
-            <textarea 
+            <textarea
               className="w-full min-h-[400px] p-6 bg-gray-50 border border-gray-100 rounded-xl text-gray-800 text-lg leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary/50 resize-y font-sans"
               value={generatedText}
               onChange={(e) => setGeneratedText(e.target.value)}
@@ -234,9 +232,9 @@ export const CreateFeedback: React.FC<CreateFeedbackProps> = ({ user, onCancel, 
               <RefreshCcw className="w-4 h-4 mr-2" />
               Regenerate
             </Button>
-            
+
             <div className="flex gap-3 w-full md:w-auto">
-               <Button variant="outline" onClick={() => {navigator.clipboard.writeText(generatedText)}}>
+              <Button variant="outline" onClick={() => { navigator.clipboard.writeText(generatedText) }}>
                 <Copy className="w-4 h-4 mr-2" />
                 Copy
               </Button>

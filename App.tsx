@@ -6,6 +6,7 @@ import { Dashboard } from './components/Dashboard';
 import { CreateFeedback } from './components/CreateFeedback';
 import { Menu } from 'lucide-react';
 import { getCurrentUser, onAuthStateChange, signOut } from './services/authService';
+import { getFeedbacks, createFeedback } from './services/feedbackService';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -13,20 +14,48 @@ const App: React.FC = () => {
   const [feedbacks, setFeedbacks] = useState<FeedbackEntry[]>([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Initialize auth state on mount
   useEffect(() => {
     const initAuth = async () => {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
+
+      // Load feedbacks if user is authenticated
+      if (currentUser) {
+        try {
+          const userFeedbacks = await getFeedbacks(currentUser.id);
+          setFeedbacks(userFeedbacks);
+        } catch (err) {
+          console.error('Error loading feedbacks:', err);
+          setError('Failed to load feedbacks');
+        }
+      }
+
       setLoading(false);
     };
 
     initAuth();
 
     // Listen for auth state changes
-    const subscription = onAuthStateChange((authUser) => {
+    const subscription = onAuthStateChange(async (authUser) => {
       setUser(authUser);
+
+      // Load feedbacks when user logs in
+      if (authUser) {
+        try {
+          const userFeedbacks = await getFeedbacks(authUser.id);
+          setFeedbacks(userFeedbacks);
+          setError(null);
+        } catch (err) {
+          console.error('Error loading feedbacks:', err);
+          setError('Failed to load feedbacks');
+        }
+      } else {
+        // Clear feedbacks when user logs out
+        setFeedbacks([]);
+      }
     });
 
     return () => {
@@ -34,24 +63,7 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Load feedbacks from local storage on mount (Mock persistence)
-  useEffect(() => {
-    const saved = localStorage.getItem('feedback_app_data');
-    if (saved) {
-      try {
-        setFeedbacks(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to parse saved feedback", e);
-      }
-    }
-  }, []);
 
-  // Save feedbacks whenever they change
-  useEffect(() => {
-    if (feedbacks.length > 0) {
-      localStorage.setItem('feedback_app_data', JSON.stringify(feedbacks));
-    }
-  }, [feedbacks]);
 
   const handleLogin = () => {
     // Auth state will be updated by the listener
@@ -69,9 +81,18 @@ const App: React.FC = () => {
     setMobileMenuOpen(false);
   };
 
-  const handleSaveFeedback = (newFeedback: FeedbackEntry) => {
-    setFeedbacks(prev => [newFeedback, ...prev]);
-    setActiveTab('dashboard');
+  const handleSaveFeedback = async (newFeedback: Omit<FeedbackEntry, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (!user) return;
+
+    try {
+      setError(null);
+      const savedFeedback = await createFeedback(newFeedback, user.id);
+      setFeedbacks(prev => [savedFeedback, ...prev]);
+      setActiveTab('dashboard');
+    } catch (err) {
+      console.error('Error saving feedback:', err);
+      setError('Failed to save feedback. Please try again.');
+    }
   };
 
   const handleViewFeedback = (feedback: FeedbackEntry) => {
