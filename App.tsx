@@ -3,6 +3,7 @@ import { User, AppState, FeedbackEntry } from './types';
 import { Login } from './components/Login';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
+import { FeedbackList } from './components/FeedbackList';
 import { CreateFeedback } from './components/CreateFeedback';
 import { FeedbackDetail } from './components/FeedbackDetail';
 import { Menu } from 'lucide-react';
@@ -166,7 +167,7 @@ const App: React.FC = () => {
             />
           )}
           {activeTab === 'history' && (
-            <Dashboard
+            <FeedbackList
               feedbacks={feedbacks}
               onCreateNew={handleCreateNew}
               onViewFeedback={handleViewFeedback}
