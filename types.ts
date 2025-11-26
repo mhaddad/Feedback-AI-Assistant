@@ -40,4 +40,4 @@ export interface User {
   role?: string;
 }
 
-export type AppState = 'auth' | 'dashboard' | 'create' | 'review' | 'settings';
+export type AppState = 'auth' | 'dashboard' | 'create' | 'review';

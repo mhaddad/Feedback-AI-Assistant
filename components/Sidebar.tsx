@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, PlusCircle, History, Settings, LogOut, Triangle } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, History, LogOut, Triangle } from 'lucide-react';
 import { AppState, User } from '../types';
 
 interface SidebarProps {
@@ -14,7 +14,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onNavigate, onLogou
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'create', label: 'Create Feedback', icon: PlusCircle },
     { id: 'history', label: 'All Feedback', icon: History }, // Mapped to dashboard for simplicity in this demo, or could be separate
-    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -31,11 +30,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onNavigate, onLogou
           <button
             key={item.id}
             onClick={() => onNavigate(item.id as AppState)}
-            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === item.id 
-                ? 'bg-primary/10 text-gray-900' 
+            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors ${activeTab === item.id
+                ? 'bg-primary/10 text-gray-900'
                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-            }`}
+              }`}
           >
             <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-black' : 'text-gray-500'}`} />
             {item.label}
@@ -53,7 +51,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onNavigate, onLogou
             <p className="text-xs text-gray-500 truncate">{user.role}</p>
           </div>
         </div>
-        <button 
+        <button
           onClick={onLogout}
           className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
         >

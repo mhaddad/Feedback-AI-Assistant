@@ -4,6 +4,7 @@ import { Login } from './components/Login';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
 import { CreateFeedback } from './components/CreateFeedback';
+import { FeedbackDetail } from './components/FeedbackDetail';
 import { Menu } from 'lucide-react';
 import { getCurrentUser, onAuthStateChange, signOut } from './services/authService';
 import { getFeedbacks, createFeedback } from './services/feedbackService';
@@ -12,6 +13,7 @@ const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<AppState>('dashboard');
   const [feedbacks, setFeedbacks] = useState<FeedbackEntry[]>([]);
+  const [selectedFeedback, setSelectedFeedback] = useState<FeedbackEntry | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -96,9 +98,7 @@ const App: React.FC = () => {
   };
 
   const handleViewFeedback = (feedback: FeedbackEntry) => {
-    // In a real app, this might open a detail view. 
-    // For now, we'll just log it or could implement a detail modal.
-    console.log("View feedback", feedback);
+    setSelectedFeedback(feedback);
   };
 
   if (loading) {
@@ -120,7 +120,7 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-[#F9FAFB] font-sans text-slate-900">
       <Sidebar
         activeTab={activeTab}
-        onNavigate={(tab) => { setActiveTab(tab); setMobileMenuOpen(false); }}
+        onNavigate={(tab) => { setActiveTab(tab); setMobileMenuOpen(false); setSelectedFeedback(null); }}
         onLogout={handleLogout}
         user={user}
       />
@@ -172,14 +172,15 @@ const App: React.FC = () => {
               onViewFeedback={handleViewFeedback}
             />
           )}
-          {activeTab === 'settings' && (
-            <div className="max-w-xl mx-auto text-center py-20">
-              <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-              <p className="text-gray-500 mt-2">Configuration options would go here.</p>
-            </div>
-          )}
+
         </div>
       </main>
+      {selectedFeedback && (
+        <FeedbackDetail
+          feedback={selectedFeedback}
+          onClose={() => setSelectedFeedback(null)}
+        />
+      )}
     </div>
   );
 };
