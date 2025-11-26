@@ -42,7 +42,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ feedbacks, onCreateNew, on
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Total Feedbacks */}
                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between h-40">
                     <span className="text-sm font-medium text-gray-500">Total Feedbacks</span>
@@ -56,13 +56,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ feedbacks, onCreateNew, on
                 </div>
 
                 {/* Model Breakdown */}
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm h-40 overflow-y-auto">
-                    <span className="text-sm font-medium text-gray-500 block mb-3">Model Breakdown</span>
-                    <div className="space-y-2">
+                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm md:col-span-2">
+                    <span className="text-sm font-medium text-gray-500 block mb-6">Feedbacks by Model</span>
+                    <div className="flex flex-wrap gap-16 md:gap-24">
                         {Object.entries(modelBreakdown).map(([model, count]) => (
-                            <div key={model} className="flex justify-between items-center text-sm">
-                                <span className="text-gray-600">{model}</span>
-                                <span className="font-semibold text-gray-900">{count}</span>
+                            <div key={model} className="flex flex-col">
+                                <span className="text-sm text-gray-500 mb-1 uppercase tracking-wide">{model}</span>
+                                <span className="text-3xl font-bold text-gray-900">{count}</span>
                             </div>
                         ))}
                         {Object.keys(modelBreakdown).length === 0 && (
