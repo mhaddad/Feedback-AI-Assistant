@@ -1,0 +1,21 @@
+services:
+  # Ambiente para Python (IA/Backend)
+  backend:
+    image: python:3.11-slim
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    command: python -m http.server 8000 --bind 0.0.0.0
+
+  # Ambiente para React/Node (Interface)
+  frontend:
+    image: node:20-slim
+    volumes:
+      - .:/app
+      - /app/node_modules # Anonymous volume to preserve container node_modules
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install && npm run dev -- --host"
